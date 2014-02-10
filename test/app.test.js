@@ -6,6 +6,9 @@ var app = require('../app'),
 
 chai.use(sinonChai);
 
+/**
+ * Test the 'spy' module of sinon
+ */
 describe('spy', function () {
 
     it('should work', function () {
@@ -17,8 +20,8 @@ describe('spy', function () {
         var callback = sinon.spy();
         var proxy = app.once(callback);
         proxy();
-        expect(callback.called)
-            .to.equal(true);
+        expect(callback)
+            .to.have.to.have.been.called;
     });
 
     it('calls the original function only once', function () {
@@ -37,7 +40,32 @@ describe('spy', function () {
             var obj = {};
             proxy.call(obj, 1, 2, 3);
 
-            expect(callback).to.have.been.calledWith(1, 2, 3);
-            expect(callback).to.have.been.calledOn(obj);
+            expect(callback)
+                .to.have.been.calledWith(1, 2, 3);
+
+            expect(callback)
+                .to.have.been.calledOn(obj);
+
+            expect(callback)
+                .to.not.have.been.calledWith(3);
         });
+});
+
+/**
+ * Test the 'stub' module of sinon
+ */
+describe('stub', function () {
+
+    it('returns the return value from the original function', function () {
+
+        /**
+         * Create a stub to return a dummy value to test against
+         */
+        var callback = sinon.stub().returns(42);
+
+        var proxy = app.once(callback);
+        var returnValue = proxy();
+
+        expect(returnValue).to.equal(42);
+    });
 });
