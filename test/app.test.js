@@ -6,6 +6,8 @@ var app = require('../app'),
 
 chai.use(sinonChai);
 
+var request = require('request');
+
 /**
  * Test the 'spy' module of sinon
  */
@@ -61,11 +63,78 @@ describe('stub', function () {
         /**
          * Create a stub to return a dummy value to test against
          */
-        var callback = sinon.stub().returns(42);
+        var callback = sinon.stub()
+            .returns(42);
 
         var proxy = app.once(callback);
         var returnValue = proxy();
 
-        expect(returnValue).to.equal(42);
+        expect(returnValue)
+            .to.equal(42);
     });
+});
+
+/**
+ * Test request to Google using stub
+ */
+describe('testing GET request to Google using stub', function () {
+
+    var spyGetGoogle;
+
+    before(function (done) {
+        spyGetGoogle = sinon.spy(app._test, 'getGoogle');
+        done();
+    });
+
+    beforeEach(function (done) {
+        spyGetGoogle.reset();
+        done();
+    });
+
+
+    /**
+     * Stubs the getData function
+     * Prevents it from calling the getGoogle function
+     */
+    it('makes a get request to getData, stubs getData', function () {
+
+        var stubGetData = sinon.stub(app, 'getData')
+            .returns({
+                message: 'hello world from stub'
+            });
+
+        var result = app.getData(stubGetData);
+
+        expect(stubGetData)
+            .to.be.calledOnce;
+
+        expect(result)
+            .to.have.deep.property("message", "hello world from stub");
+
+        expect(spyGetGoogle)
+            .not.to.have.been.called;
+    });
+
+    it('stubs the "request" library to return dummy result', function () {
+
+        var stubRequestGet = sinon.stub(request, 'get')
+            .returns({
+                message: 'This is not Google, its me the stub!'
+            });
+
+        var result = app._test.getGoogle(function (err, body) {
+            console.log(err, body);
+        });
+
+        expect(stubRequestGet)
+            .to.have.been.calledOnce;
+
+        expect(stubRequestGet)
+            .to.have.been.calledAfter.spyGetGoogle;
+
+        expect(stubRequestGet)
+            .to.have.returned({
+                message: 'This is not Google, its me the stub!'
+            });
+    })
 });
