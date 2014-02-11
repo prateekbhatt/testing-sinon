@@ -32,9 +32,7 @@ exports.getData = function (callback) {
  * @api private
  */
 var getGoogle = function (callback) {
-    return request.get("http://www.google.com", function (error, response, body) {
-        return callback(null, body);
-    });
+    return request.get("http://www.google.com", callback);
 }
 
 /**

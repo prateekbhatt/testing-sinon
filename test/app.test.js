@@ -117,7 +117,8 @@ describe('testing GET request to Google using stub', function () {
 
     it('stubs the "request" library to return dummy result', function () {
 
-        var stubRequestGet = sinon.stub(request, 'get')
+        var stubRequestGet = sinon.stub(request, 'get');
+        stubRequestGet.withArgs('http://www.google.com')
             .returns({
                 message: 'This is not Google, its me the stub!'
             });
